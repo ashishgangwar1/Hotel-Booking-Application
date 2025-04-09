@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 const RoomAvailability = () => {
+  const navigate=useNavigate();
   const [formData, setFormData] = useState({
     checkIn: "",
     checkOut: "",
@@ -20,9 +21,11 @@ const RoomAvailability = () => {
     e.preventDefault();
     // Simulate checking availability (you can replace with API call)
     console.log("Checking availability with:", formData);
-    alert("Checking room availability...");
-  };
+    // After successful form submission in RoomAvailability.jsx
+    navigate("/available-rooms");
 
+  };
+  
   return (
     <div className="max-w-xl mx-auto p-6 bg-black shadow-md rounded-lg mt-10 dark:bg-white dark:text-black">
       <h2 className="text-2xl font-bold mb-6 text-center">Check Room Availability</h2>

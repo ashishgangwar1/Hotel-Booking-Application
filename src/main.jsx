@@ -11,6 +11,9 @@ import Signup from './Page/Signup.jsx'
 import PrivacyPolicy from './Page/PrivacyPolicy.jsx'
 import TermsAndConditions from './Page/TermsAndConditions.jsx'
 import RoomAvailability from './Page/RoomAvailability.jsx'
+import AvailableRooms from './Page/AvailableRoom.jsx'
+import UserProfile from './Page/UserProfile.jsx'
+import BookingHistory from './Page/BookingHistory.jsx'
 const router =createBrowserRouter([
   {
     path:'/',
@@ -43,6 +46,19 @@ const router =createBrowserRouter([
       {
         path:"room-availability",
         element:<RoomAvailability />
+      }
+      ,
+      {
+        path:"available-rooms",
+        element:<AvailableRooms />
+      },
+      {
+        path:"profile",
+        element:<UserProfile />
+      },
+      {
+        path:"booking-history",
+        element:<BookingHistory />
       }
     ]
   }
