@@ -16,22 +16,30 @@ class RoomSerializer(serializers.ModelSerializer):
 class HotelSerializer(serializers.ModelSerializer):
     # This line ensures the list of rooms is included when fetching hotel details
     rooms = RoomSerializer(many=True, read_only=True) 
+    upcoming_bookings = serializers.SerializerMethodField()
 
     class Meta:
         model = Hotel
-        fields = ['id', 'name', 'city', 'address', 'description', 'main_image', 'rooms']
+        fields = ['id', 'name', 'city', 'address', 'description', 'main_image', 'rooms', 'upcoming_bookings']
+    
+    def get_upcoming_bookings(self, obj):
+        # We filter bookings where the room belongs to this specific hotel
+        bookings = Booking.objects.filter(room__hotel=obj).order_by('check_in_date')
+        return BookingSerializer(bookings, many=True).data
 
 
 class BookingSerializer(serializers.ModelSerializer):
     # User is read-only, set automatically by perform_create in the view
-    user = serializers.ReadOnlyField(source='user.username') 
+    room_name = serializers.ReadOnlyField(source='room.room_type')
+    guest_name = serializers.ReadOnlyField(source='user.username') 
     
     class Meta:
         model = Booking
         fields = [
-            'id', 
-            'user', 
+            'id',
             'room', 
+            'room_name',
+            'guest_name',
             'check_in_date', 
             'check_out_date', 
             'num_guests', 
@@ -39,7 +47,7 @@ class BookingSerializer(serializers.ModelSerializer):
             'booked_at'
         ]
         # Only 'booked_at' is truly read-only (auto-added date)
-        read_only_fields = ['booked_at']
+        read_only_fields = ['booked_at', 'room_name', 'guest_name']
 
 
 class RegisterSerializer(serializers.ModelSerializer):

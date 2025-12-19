@@ -7,6 +7,8 @@ from django.db.models import Q
 from django.contrib.auth.models import User # For RegisterView
 from .permissions import IsHotelManagerOrReadOnly
 from rest_framework.permissions import IsAuthenticated
+from datetime import datetime
+from django.utils import timezone
 
 from .models import Hotel, Room, Booking
 from .serializers import (
@@ -73,14 +75,40 @@ class HotelViewSet(viewsets.ReadOnlyModelViewSet):
             hotel = Hotel.objects.get(manager=user)
         except Hotel.DoesNotExist:
             # If the user is authenticated but not linked to a hotel, deny access
-            return Response({"detail": "Access Denied: You are not assigned to manage any hotel."}, 
-                            status=status.HTTP_403_FORBIDDEN)
+            return Response(
+                {"detail": "Access Denied: You are not assigned to manage any hotel."}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
         
-        # Check 2: Serialization
-        # We use self.get_serializer() to ensure the HotelSerializer is used, 
-        # which includes the nested room data needed by the dashboard.
+
+        # 2. Get the date from query parameters (e.g., ?date=2023-12-25)
+        date_str = request.query_params.get('date')
+        if date_str:
+            try:
+                # Convert string to date object
+                filter_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            except ValueError:
+                return Response({"error": "Invalid date format. Use YYYY-MM-DD."}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            # Default: Use today's date for "Upcoming" bookings
+            filter_date = timezone.now().date()
+
+        # 3. Serialize the basic hotel data
         serializer = self.get_serializer(hotel)
-        return Response(serializer.data)
+        data = serializer.data
+
+        # 4. Fetch and Filter Bookings
+        # We only want bookings where the guest hasn't checked out yet relative to our filter_date
+        bookings = Booking.objects.filter(
+            room__hotel=hotel,
+            check_out_date__gte=filter_date
+        ).order_by('check_in_date')
+
+        # 5. Inject the filtered bookings into the response
+        # This replaces the static 'upcoming_bookings' from the SerializerMethodField
+        data['upcoming_bookings'] = BookingSerializer(bookings, many=True).data
+        
+        return Response(data)
 
 class RoomViewSet(viewsets.ModelViewSet):
     
