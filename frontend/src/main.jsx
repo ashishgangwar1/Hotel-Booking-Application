@@ -1,6 +1,3 @@
-// frontend/src/main.jsx (Standard Vite Setup)
-
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import { BrowserRouter as Router } from 'react-router-dom';
@@ -11,11 +8,10 @@ import { AuthProvider } from './context/AuthContext';
 
 // Make sure 'root' is the correct ID from your index.html
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+
     <Router> {/* Router is now here */}
         <AuthProvider> 
             <App />
         </AuthProvider>
     </Router>
-  </React.StrictMode>,
 );

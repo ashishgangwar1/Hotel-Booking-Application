@@ -5,8 +5,8 @@ import axios from 'axios';
 import SearchForm from '../components/SearchForm';
 import HotelList from '../components/HotelList'; 
 
-const ALL_HOTELS_URL = 'http://127.0.0.1:8000/api/hotels/'; 
-const SEARCH_URL = 'http://127.0.0.1:8000/api/hotels/search/'; 
+const ALL_HOTELS_URL = '/api/hotels/'; 
+const SEARCH_URL = '/api/hotels/search/'; 
 
 function HomePage() {
     // searchResults will now hold either available rooms (after search) or all hotels (on load)

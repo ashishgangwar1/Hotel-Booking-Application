@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: hotel-booking-app
+    runtime: python
+    plan: free
+    buildCommand: |
+      echo "=== Backend deps ==="
+      pip install -r backend/requirements.txt
+
+      echo "=== Frontend deps ==="
+      cd frontend
+      npm install
+      npm run build
+
+      echo "=== Move Vite dist to Django ==="
+      rm -rf ../backend/frontend_build
+      mkdir -p ../backend/frontend_build
+      cp -r dist/* ../backend/frontend_build/
+
+      echo "=== Collect static ==="
+      cd ../backend
+      python manage.py collectstatic --noinput
+
+    startCommand: |
+      cd backend
+      python manage.py migrate
+      gunicorn core.wsgi:application
+
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: core.settings
+      - key: PYTHON_VERSION
+        value: 3.11.8

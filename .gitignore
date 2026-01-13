@@ -10,6 +10,8 @@ __pycache__/
 .pytest_cache/
 .vscode/
 
+/backend/db.sqlite3
+
 # ------------------------------------
 # 2. NODE/VITE FRONTEND (Your current .gitignore contents)
 # ------------------------------------

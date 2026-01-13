@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom'; // (You should have added this fix prev
 // VVVVVV ADD THIS CRITICAL IMPORT VVVVVV
 import ProtectedRoute from '../components/ProtectedRoute'; 
 
-const BASE_URL = 'http://127.0.0.1:8000/api/';
+const BASE_URL = '/api/';
 
 // ... rest of the code ...
 

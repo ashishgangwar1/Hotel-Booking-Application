@@ -5,8 +5,8 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import ProtectedRoute from '../components/ProtectedRoute';
 
-const BASE_URL = 'http://127.0.0.1:8000/api/';
-const MY_HOTEL_URL = 'http://127.0.0.1:8000/api/hotels/my_hotel/';
+const BASE_URL = '/api/';
+const MY_HOTEL_URL = '/api/hotels/my_hotel/';
 
 // Component to handle adding a new room
 const AddRoomForm = ({ hotelId, authTokens, onRoomAdded }) => {

@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
-const BASE_URL = 'http://127.0.0.1:8000/api/';
+const BASE_URL = 'api/';
 
 export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
