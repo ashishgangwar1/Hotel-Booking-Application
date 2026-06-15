@@ -1,29 +1,32 @@
-# ------------------------------------
-# 1. PYTHON BACKEND (The cause of your warnings)
-# ------------------------------------
-# Ignore the Python virtual environment folder
+# Python
 /backend/venv/
-# Ignore Python cache files
 __pycache__/
 *.pyc
 .mypy_cache/
 .pytest_cache/
+
+# VS Code
 .vscode/
 
-# ------------------------------------
-# 2. NODE/VITE FRONTEND (Your current .gitignore contents)
-# ------------------------------------
-# Ignore node_modules folder
+# Django
+*.sqlite3
+staticfiles/
+media/
+
+# Frontend
 /frontend/node_modules/
-# Vite output directory
+
 /frontend/dist/
-# Log files
+
+# Logs
 npm-debug.log
 .yarn-integrity
 
-# ------------------------------------
-# 3. ENVIRONMENT & SECRETS
-# ------------------------------------
-# Ignore local settings and secrets (CRITICAL for security)
-*.env
+# Environment variables
+.env
 .env.local
+*.env
+
+# OS files
+.DS_Store
+Thumbs.db
