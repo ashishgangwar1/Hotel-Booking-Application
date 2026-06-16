@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .models import Booking
+from .availability_service import AvailabilityService
 
 class CreateBookingView(generics.CreateAPIView):
 
@@ -29,19 +30,11 @@ class CreateBookingView(generics.CreateAPIView):
                 "Check-out must be after check-in."
             )
 
-        if not room.is_available:
-            raise ValidationError(
-                "Room is not available."
-            )
-
-        overlap = Booking.objects.filter(
-            room=room,
-            status="CONFIRMED",
-            check_in__lt=check_out,
-            check_out__gt=check_in
-        ).exists()
-
-        if overlap:
+        if not AvailabilityService.is_room_available(
+            room,
+            check_in,
+            check_out
+        ):
             raise ValidationError(
                 "Room already booked for selected dates."
             )
@@ -49,7 +42,7 @@ class CreateBookingView(generics.CreateAPIView):
         serializer.save(
             user=self.request.user
         )
-
+        
 class MyBookingsView(generics.ListAPIView):
 
     serializer_class = BookingSerializer

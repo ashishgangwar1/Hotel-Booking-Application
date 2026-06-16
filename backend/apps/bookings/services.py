@@ -1,25 +1,14 @@
+from django.db import transaction
+
 from .models import Booking
+from .availability_service import AvailabilityService
+from apps.hotels.models import Room
 
 
 class BookingService:
 
     @staticmethod
-    def room_is_available(
-        room,
-        check_in,
-        check_out
-    ):
-
-        overlapping = Booking.objects.filter(
-            room=room,
-            status="CONFIRMED",
-            check_in__lt=check_out,
-            check_out__gt=check_in
-        )
-
-        return not overlapping.exists()
-
-    @staticmethod
+    @transaction.atomic
     def create_booking(
         user,
         room,
@@ -28,13 +17,22 @@ class BookingService:
         guests
     ):
 
-        if not BookingService.room_is_available(
+        room = Room.objects.select_for_update().get(
+            id=room.id
+        )
+
+        if check_in >= check_out:
+            raise ValueError(
+                "Check-out must be after check-in."
+            )
+
+        if not AvailabilityService.is_room_available(
             room,
             check_in,
             check_out
         ):
             raise ValueError(
-                "Room is not available"
+                "Room already booked for selected dates."
             )
 
         return Booking.objects.create(
