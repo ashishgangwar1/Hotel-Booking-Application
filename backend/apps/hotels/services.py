@@ -17,3 +17,11 @@ class HotelService:
         return Hotel.objects.filter(
             city__icontains=city
         )
+    
+    @staticmethod
+    def get_user_hotels(user):
+
+        return Hotel.objects.filter(
+            owner=user
+        )
+    

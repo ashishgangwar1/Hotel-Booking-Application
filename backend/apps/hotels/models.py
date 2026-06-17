@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 
 class Amenity(models.Model):
     name = models.CharField(
@@ -12,6 +12,15 @@ class Amenity(models.Model):
 
 
 class Hotel(models.Model):
+    
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="owned_hotels",
+        null=True,
+        blank=True
+    )
+
     name = models.CharField(max_length=255)
 
     description = models.TextField()
@@ -38,6 +47,25 @@ class Hotel(models.Model):
     def __str__(self):
         return self.name
 
+class HotelImage(models.Model):
+
+    hotel = models.ForeignKey(
+        Hotel,
+        on_delete=models.CASCADE,
+        related_name="images"
+    )
+
+    image = models.ImageField(
+        upload_to="hotel_images/"
+    )
+
+    is_primary = models.BooleanField(
+        default=False
+    )
+
+    def __str__(self):
+        return f"{self.hotel.name} Image"
+    
 
 class RoomType(models.Model):
     hotel = models.ForeignKey(
@@ -82,3 +110,22 @@ class Room(models.Model):
 
     def __str__(self):
         return f"{self.hotel.name} - {self.room_number}"
+
+class RoomImage(models.Model):
+
+    room = models.ForeignKey(
+        Room,
+        on_delete=models.CASCADE,
+        related_name="images"
+    )
+
+    image = models.ImageField(
+        upload_to="room_images/"
+    )
+
+    def __str__(self):
+        return f"{self.room.room_number} Image"
+    
+
+
+   

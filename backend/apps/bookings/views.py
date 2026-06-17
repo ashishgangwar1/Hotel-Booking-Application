@@ -21,6 +21,13 @@ class CreateBookingView(generics.CreateAPIView):
     def perform_create(self, serializer):
 
         room = serializer.validated_data["room"]
+        
+        guests = serializer.validated_data["guests"]
+
+        if guests > room.room_type.capacity:
+            raise ValidationError(
+                f"Maximum {room.room_type.capacity} guests allowed."
+            )
 
         check_in = serializer.validated_data["check_in"]
         check_out = serializer.validated_data["check_out"]

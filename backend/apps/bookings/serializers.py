@@ -12,5 +12,8 @@ class BookingSerializer(serializers.ModelSerializer):
             "id",
             "user",
             "status",
-            "created_at"
+            "created_at",
+            "booking_reference",
+            "price_per_night",
+            "total_amount",
         )
