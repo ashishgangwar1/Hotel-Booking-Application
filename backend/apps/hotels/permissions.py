@@ -1,7 +1,7 @@
 from rest_framework.permissions import BasePermission
+from apps.accounts.models import UserRole
 
-
-class IsHotelOwner(BasePermission):
+class IsManagerOrAdmin(BasePermission):
 
     def has_permission(
         self,
@@ -11,6 +11,8 @@ class IsHotelOwner(BasePermission):
         return (
             request.user.is_authenticated
             and
-            request.user.profile.role
-            == "HOTEL_OWNER"
+            request.user.profile.role in [
+                UserRole.MANAGER,
+                UserRole.ADMIN
+            ]
         )

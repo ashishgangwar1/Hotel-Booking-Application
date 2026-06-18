@@ -32,6 +32,22 @@ class RoomImageSerializer(serializers.ModelSerializer):
 
 class RoomSerializer(serializers.ModelSerializer):
 
+    def validate(self, attrs):
+
+        hotel = attrs.get("hotel")
+        room_type = attrs.get("room_type")
+
+        if (
+            hotel
+            and room_type
+            and room_type.hotel_id != hotel.id
+        ):
+            raise serializers.ValidationError(
+                "RoomType does not belong to this hotel."
+            )
+
+        return attrs
+
     images = RoomImageSerializer(
         many=True,
         read_only=True

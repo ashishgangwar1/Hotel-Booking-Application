@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from .models import Profile
+from .models import Profile, UserRole
 
 
 class AccountService:
@@ -18,7 +18,8 @@ class AccountService:
         )
 
         Profile.objects.create(
-            user=user
+            user=user,
+            role=UserRole.CUSTOMER
         )
 
         return user

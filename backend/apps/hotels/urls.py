@@ -8,6 +8,9 @@ from .views import (
     MyHotelsView,
     CreateHotelView,
     UpdateHotelView,
+    CreateRoomTypeView,
+    UpdateRoomTypeView,
+    DeleteRoomTypeView,
 )
 
 urlpatterns = [
@@ -48,5 +51,22 @@ urlpatterns = [
         "<int:pk>/update/",
         UpdateHotelView.as_view(),
         name="hotel-update"
+    ),
+    path(
+        "room-types/create/",
+        CreateRoomTypeView.as_view(),
+        name="room-type-create"
+    ),
+
+    path(
+        "room-types/<int:pk>/update/",
+        UpdateRoomTypeView.as_view(),
+        name="room-type-update"
+    ),
+
+    path(
+        "room-types/<int:pk>/delete/",
+        DeleteRoomTypeView.as_view(),
+        name="room-type-delete"
     ),
 ]
