@@ -15,6 +15,8 @@ from .availability_service import AvailabilityService
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import PermissionDenied
 from django.utils import timezone
+from django.db.models import Sum
+from apps.hotels.models import Hotel, Room
 
 class CreateBookingView(generics.CreateAPIView):
 
@@ -190,4 +192,64 @@ class CompleteBookingView(APIView):
 
         return Response(
             {"message": "Booking completed"}
+        )
+
+class ManagerDashboardView(APIView):
+
+    permission_classes = [IsManagerOrAdmin]
+
+    def get(self, request):
+
+        hotels = Hotel.objects.filter(
+            owner=request.user
+        )
+
+        rooms = Room.objects.filter(
+            hotel__owner=request.user
+        )
+
+        bookings = Booking.objects.filter(
+            room__hotel__owner=request.user
+        )
+
+        data = {
+            "total_hotels": hotels.count(),
+            "total_rooms": rooms.count(),
+            "total_bookings": bookings.count(),
+            "pending_bookings":
+                bookings.filter(
+                    status="PENDING"
+                ).count(),
+
+            "confirmed_bookings":
+                bookings.filter(
+                    status="CONFIRMED"
+                ).count(),
+
+            "completed_bookings":
+                bookings.filter(
+                    status="COMPLETED"
+                ).count(),
+
+            "total_revenue":
+                bookings.filter(
+                    status="COMPLETED"
+                ).aggregate(
+                    total=Sum("total_amount")
+                )["total"] or 0
+        }
+
+        return Response(data)
+    
+class MyBookingDetailView(
+    generics.RetrieveAPIView
+):
+
+    serializer_class = BookingSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+
+        return Booking.objects.filter(
+            user=self.request.user
         )

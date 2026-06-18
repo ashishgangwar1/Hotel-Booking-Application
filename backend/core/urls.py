@@ -47,6 +47,11 @@ urlpatterns = [
         TokenRefreshView.as_view(),
         name="token_refresh"
     ),
+
+    path(
+        "api/reviews/",
+        include("apps.reviews.urls")
+    ),
 ]
 
 # Media files during development

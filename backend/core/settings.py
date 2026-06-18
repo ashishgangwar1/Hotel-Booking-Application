@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "apps.accounts",
     "apps.hotels",
     "apps.bookings",
+    "apps.reviews",
 ]
 
 
