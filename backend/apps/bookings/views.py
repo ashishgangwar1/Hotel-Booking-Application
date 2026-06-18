@@ -4,7 +4,7 @@ from rest_framework.exceptions import ValidationError
 
 from .models import Booking
 from .serializers import BookingSerializer
-
+from apps.accounts.permissions import IsManagerOrAdmin
 from apps.hotels.models import Room
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -67,6 +67,7 @@ class CancelBookingView(APIView):
     def post(self, request, pk):
 
         booking = Booking.objects.get(
+            Booking,
             pk=pk,
             user=request.user
         )
@@ -78,3 +79,81 @@ class CancelBookingView(APIView):
             {"message": "Booking cancelled"},
             status=status.HTTP_200_OK
         )
+    
+class ManagerBookingsView(APIView):
+
+    permission_classes = [
+        IsManagerOrAdmin
+    ]
+
+    def get(self, request):
+
+        bookings = Booking.objects.filter(
+            room__hotel__owner=request.user
+        ).select_related(
+            "user",
+            "room",
+            "room__hotel"
+        )
+
+        serializer = BookingSerializer(
+            bookings,
+            many=True
+        )
+
+        return Response(
+            serializer.data
+        )
+    
+class ApproveBookingView(APIView):
+
+    permission_classes = [
+        IsManagerOrAdmin
+    ]
+
+    def post(self, request, pk):
+
+        booking = get_object_or_404(
+            Booking,
+            pk=pk
+        )
+
+        if (
+            request.user.profile.role != "ADMIN"
+            and booking.room.hotel.owner != request.user
+        ):
+            raise PermissionDenied()
+
+        booking.status = "CONFIRMED"
+        booking.save()
+
+        return Response(
+            {"message": "Booking approved"}
+        )
+    
+class RejectBookingView(APIView):
+
+    permission_classes = [
+        IsManagerOrAdmin
+    ]
+
+    def post(self, request, pk):
+
+        booking = get_object_or_404(
+            Booking,
+            pk=pk
+        )
+
+        if (
+            request.user.profile.role != "ADMIN"
+            and booking.room.hotel.owner != request.user
+        ):
+            raise PermissionDenied()
+
+        booking.status = "CANCELLED"
+        booking.save()
+
+        return Response(
+            {"message": "Booking rejected"}
+        )
+    

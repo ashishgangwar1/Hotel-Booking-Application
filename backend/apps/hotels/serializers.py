@@ -32,10 +32,32 @@ class RoomImageSerializer(serializers.ModelSerializer):
 
 class RoomSerializer(serializers.ModelSerializer):
 
+    # def validate(self, attrs):
+
+    #     hotel = attrs.get("hotel")
+    #     room_type = attrs.get("room_type")
+
+    #     if (
+    #         hotel
+    #         and room_type
+    #         and room_type.hotel_id != hotel.id
+    #     ):
+    #         raise serializers.ValidationError(
+    #             "RoomType does not belong to this hotel."
+    #         )
+
+    #     return attrs
     def validate(self, attrs):
 
-        hotel = attrs.get("hotel")
-        room_type = attrs.get("room_type")
+        hotel = attrs.get(
+            "hotel",
+            getattr(self.instance, "hotel", None)
+        )
+
+        room_type = attrs.get(
+            "room_type",
+            getattr(self.instance, "room_type", None)
+        )
 
         if (
             hotel
@@ -120,3 +142,8 @@ class HotelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hotel
         fields = "__all__"
+
+        read_only_fields = (
+            "owner",
+            "created_at"
+        )

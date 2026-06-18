@@ -12,6 +12,7 @@ class Booking(models.Model):
     )
 
     STATUS_CHOICES = [
+        ("PENDING", "Pending"),
         ("CONFIRMED", "Confirmed"),
         ("CANCELLED", "Cancelled"),
         ("COMPLETED", "Completed"),
@@ -51,7 +52,7 @@ class Booking(models.Model):
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
-        default="CONFIRMED"
+        default="PENDING"
     )
 
     created_at = models.DateTimeField(

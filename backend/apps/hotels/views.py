@@ -20,6 +20,7 @@ from .models import (
     Room
 )
 from django.shortcuts import get_object_or_404
+from apps.accounts.models import UserRole
 
 class HotelListView(APIView):
 
@@ -102,8 +103,11 @@ class HotelRoomsView(APIView):
     
 class MyHotelsView(APIView):
 
+    # permission_classes = [
+    #     IsAuthenticated
+    # ]
     permission_classes = [
-        IsAuthenticated
+        IsManagerOrAdmin
     ]
 
     def get(self, request):
@@ -158,11 +162,22 @@ class UpdateHotelView(APIView):
         pk
     ):
 
-        hotel = Hotel.objects.get(
+        # hotel = Hotel.objects.get(
+        #     pk=pk
+        # )
+        hotel = get_object_or_404(
+            Hotel,
             pk=pk
         )
 
-        if hotel.owner != request.user:
+        # if hotel.owner != request.user:
+        #     raise PermissionDenied(
+        #         "You do not own this hotel."
+        #     )
+        if (
+            request.user.profile.role != "ADMIN"
+            and hotel.owner != request.user
+        ):
             raise PermissionDenied(
                 "You do not own this hotel."
             )
@@ -181,6 +196,37 @@ class UpdateHotelView(APIView):
 
         return Response(
             serializer.data
+        )
+    
+class DeleteHotelView(APIView):
+
+    permission_classes = [
+        IsManagerOrAdmin
+    ]
+
+    def delete(
+        self,
+        request,
+        pk
+    ):
+
+        hotel = get_object_or_404(
+            Hotel,
+            pk=pk
+        )
+
+        if (
+            request.user.profile.role != "ADMIN"
+            and hotel.owner != request.user
+        ):
+            raise PermissionDenied(
+                "You do not own this hotel."
+            )
+
+        hotel.delete()
+
+        return Response(
+            status=status.HTTP_204_NO_CONTENT
         )
     
 class CreateRoomTypeView(APIView):
@@ -286,4 +332,147 @@ class DeleteRoomTypeView(APIView):
 
         return Response(
             status=status.HTTP_204_NO_CONTENT
+        )
+    
+class CreateRoomView(APIView):
+
+    permission_classes = [
+        IsManagerOrAdmin
+    ]
+
+    def post(self, request):
+
+        serializer = RoomSerializer(
+            data=request.data
+        )
+
+        serializer.is_valid(
+            raise_exception=True
+        )
+
+        hotel = serializer.validated_data["hotel"]
+
+        if (
+            request.user.profile.role != "ADMIN"
+            and hotel.owner != request.user
+        ):
+            raise PermissionDenied(
+                "You do not own this hotel."
+            )
+
+        serializer.save()
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_201_CREATED
+        )
+    
+class UpdateRoomView(APIView):
+
+    permission_classes = [
+        IsManagerOrAdmin
+    ]
+
+    def put(
+        self,
+        request,
+        pk
+    ):
+
+        room = get_object_or_404(
+            Room,
+            pk=pk
+        )
+
+        if (
+            request.user.profile.role != "ADMIN"
+            and room.hotel.owner != request.user
+        ):
+            raise PermissionDenied(
+                "You do not own this hotel."
+            )
+
+        serializer = RoomSerializer(
+            room,
+            data=request.data,
+            partial=True
+        )
+
+        serializer.is_valid(
+            raise_exception=True
+        )
+
+        serializer.save()
+
+        return Response(
+            serializer.data
+        )
+    
+class DeleteRoomView(APIView):
+
+    permission_classes = [
+        IsManagerOrAdmin
+    ]
+
+    def delete(
+        self,
+        request,
+        pk
+    ):
+
+        room = get_object_or_404(
+            Room,
+            pk=pk
+        )
+
+        if (
+            request.user.profile.role != "ADMIN"
+            and room.hotel.owner != request.user
+        ):
+            raise PermissionDenied(
+                "You do not own this hotel."
+            )
+
+        room.delete()
+
+        return Response(
+            status=status.HTTP_204_NO_CONTENT
+        )
+    
+class ManagerRoomListView(APIView):
+
+    permission_classes = [
+        IsManagerOrAdmin
+    ]
+
+    def get(self, request):
+
+        # rooms = Room.objects.filter(
+        #     hotel__owner=request.user
+        # ).select_related(
+        #     "hotel",
+        #     "room_type"
+        # )
+        # if request.user.profile.role == "ADMIN":
+        if request.user.profile.role == UserRole.ADMIN:
+            rooms = Room.objects.all()
+        else:
+            rooms = Room.objects.filter(
+                hotel__owner=request.user
+            )
+
+        rooms = rooms.select_related(
+            "hotel",
+            "room_type"
+        ).prefetch_related(
+            "images"
+        )
+
+        serializer = RoomSerializer(
+            rooms,
+            many=True
+        )
+
+        return Response(
+            serializer.data
         )
