@@ -12,6 +12,9 @@ from rest_framework import status
 
 from .models import Booking
 from .availability_service import AvailabilityService
+from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import PermissionDenied
+from django.utils import timezone
 
 class CreateBookingView(generics.CreateAPIView):
 
@@ -66,7 +69,7 @@ class CancelBookingView(APIView):
 
     def post(self, request, pk):
 
-        booking = Booking.objects.get(
+        booking = get_object_or_404(
             Booking,
             pk=pk,
             user=request.user
@@ -125,6 +128,8 @@ class ApproveBookingView(APIView):
             raise PermissionDenied()
 
         booking.status = "CONFIRMED"
+        booking.approved_by = request.user
+        booking.approved_at = timezone.now()
         booking.save()
 
         return Response(
@@ -150,10 +155,39 @@ class RejectBookingView(APIView):
         ):
             raise PermissionDenied()
 
-        booking.status = "CANCELLED"
+        booking.status = "REJECTED"
+        booking.rejected_by = request.user
+        booking.rejected_at = timezone.now()
         booking.save()
 
         return Response(
             {"message": "Booking rejected"}
         )
     
+class CompleteBookingView(APIView):
+
+    permission_classes = [
+        IsManagerOrAdmin
+    ]
+
+    def post(self, request, pk):
+
+        booking = get_object_or_404(
+            Booking,
+            pk=pk
+        )
+
+        if (
+            request.user.profile.role != "ADMIN"
+            and booking.room.hotel.owner != request.user
+        ):
+            raise PermissionDenied()
+
+        booking.status = "COMPLETED"
+        booking.completed_by = request.user
+        booking.completed_at = timezone.now()
+        booking.save()
+
+        return Response(
+            {"message": "Booking completed"}
+        )

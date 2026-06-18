@@ -7,6 +7,7 @@ from .views import (
     ManagerBookingsView,
     ApproveBookingView,
     RejectBookingView,
+    CompleteBookingView,
 )
 
 urlpatterns = [
@@ -17,7 +18,6 @@ urlpatterns = [
     "manager/",
         ManagerBookingsView.as_view()
     ),
-
     path(
         "manager/<int:pk>/approve/",
         ApproveBookingView.as_view()
@@ -26,5 +26,9 @@ urlpatterns = [
     path(
         "manager/<int:pk>/reject/",
         RejectBookingView.as_view()
+    ),
+    path(
+        "manager/<int:pk>/complete/",
+        CompleteBookingView.as_view()
     ),
 ]

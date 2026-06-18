@@ -14,6 +14,7 @@ class Booking(models.Model):
     STATUS_CHOICES = [
         ("PENDING", "Pending"),
         ("CONFIRMED", "Confirmed"),
+        ("REJECTED", "Rejected"),
         ("CANCELLED", "Cancelled"),
         ("COMPLETED", "Completed"),
     ]
@@ -57,6 +58,46 @@ class Booking(models.Model):
 
     created_at = models.DateTimeField(
         auto_now_add=True
+    )
+
+    
+    approved_by = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="approved_bookings"
+    )
+
+    approved_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    rejected_by = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="rejected_bookings"
+    )
+
+    rejected_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    completed_by = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="completed_bookings"
+    )
+
+    completed_at = models.DateTimeField(
+        null=True,
+        blank=True
     )
 
     def __str__(self):
