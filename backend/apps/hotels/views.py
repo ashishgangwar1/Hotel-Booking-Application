@@ -114,15 +114,29 @@ class HotelSearchView(APIView):
                     },
                     status=status.HTTP_400_BAD_REQUEST
                 )
+            
+        rating = request.query_params.get(
+            "rating"
+        )
 
         if rating:
-            rating = float(rating)
+            try:
+                rating = float(rating)
 
-            if rating < 0 or rating > 5:
+                if rating < 0 or rating > 5:
+                    return Response(
+                        {
+                            "error":
+                            "rating must be between 0 and 5"
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+            except ValueError:
                 return Response(
                     {
                         "error":
-                        "rating must be between 0 and 5"
+                        "rating must be a number"
                     },
                     status=status.HTTP_400_BAD_REQUEST
                 )
