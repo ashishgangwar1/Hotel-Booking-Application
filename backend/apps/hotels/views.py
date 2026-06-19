@@ -21,6 +21,8 @@ from .models import (
 )
 from django.shortcuts import get_object_or_404
 from apps.accounts.models import UserRole
+from rest_framework import status
+from datetime import datetime
 
 class HotelListView(APIView):
 
@@ -40,14 +42,93 @@ class HotelListView(APIView):
 
 class HotelSearchView(APIView):
 
+    ALLOWED_FILTERS = {
+        "city",
+        "rating",
+        "amenity",
+        "min_price",
+        "max_price",
+        "room_type",
+        "guests",
+        "check_in",
+        "check_out"
+    }
+
     def get(self, request):
 
-        city = request.GET.get(
-            "city"
+        invalid = (
+            set(request.query_params.keys())
+            - self.ALLOWED_FILTERS
         )
 
+        if invalid:
+            return Response(
+                {
+                    "error": (
+                        f"Invalid filters: "
+                        f"{', '.join(invalid)}"
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        check_in = request.query_params.get(
+            "check_in"
+        )
+
+        check_out = request.query_params.get(
+            "check_out"
+        )
+
+        if (
+            (check_in and not check_out)
+            or
+            (check_out and not check_in)
+        ):
+            return Response(
+                {
+                    "error":
+                    "check_in and check_out must be provided together"
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )  
+
+        if check_in and check_out:
+
+            try:
+                check_in_date = datetime.strptime(
+                    check_in,
+                    "%Y-%m-%d"
+                ).date()
+
+                check_out_date = datetime.strptime(
+                    check_out,
+                    "%Y-%m-%d"
+                ).date()
+
+            except ValueError:
+                return Response(
+                    {
+                        "error":
+                        "Date format must be YYYY-MM-DD"
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+        if rating:
+            rating = float(rating)
+
+            if rating < 0 or rating > 5:
+                return Response(
+                    {
+                        "error":
+                        "rating must be between 0 and 5"
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
         hotels = HotelService.search_hotels(
-            city
+            request.query_params
         )
 
         serializer = HotelSerializer(
