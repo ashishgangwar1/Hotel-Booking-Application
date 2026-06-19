@@ -52,6 +52,10 @@ urlpatterns = [
         "api/reviews/",
         include("apps.reviews.urls")
     ),
+    path(
+        "api/payments/",
+        include("apps.payments.urls")
+    ),
 ]
 
 # Media files during development

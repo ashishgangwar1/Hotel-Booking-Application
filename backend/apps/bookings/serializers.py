@@ -1,9 +1,12 @@
 from rest_framework import serializers
-
 from .models import Booking
 
 
 class BookingSerializer(serializers.ModelSerializer):
+
+    payment_method = serializers.CharField(
+        write_only=True
+    )
 
     class Meta:
         model = Booking

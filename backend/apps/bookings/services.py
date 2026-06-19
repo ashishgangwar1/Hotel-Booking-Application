@@ -3,7 +3,7 @@ from django.db import transaction
 from .models import Booking
 from .availability_service import AvailabilityService
 from apps.hotels.models import Room
-
+from apps.payments.services import create_payment
 
 class BookingService:
 
@@ -35,10 +35,21 @@ class BookingService:
                 "Room already booked for selected dates."
             )
 
-        return Booking.objects.create(
+        # return Booking.objects.create(
+        #     user=user,
+        #     room=room,
+        #     check_in=check_in,
+        #     check_out=check_out,
+        #     guests=guests
+        # )
+        booking = Booking.objects.create(
             user=user,
             room=room,
             check_in=check_in,
             check_out=check_out,
             guests=guests
         )
+
+        create_payment(booking)
+
+        return booking

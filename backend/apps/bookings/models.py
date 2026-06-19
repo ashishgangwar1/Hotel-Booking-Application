@@ -17,6 +17,7 @@ class Booking(models.Model):
         ("REJECTED", "Rejected"),
         ("CANCELLED", "Cancelled"),
         ("COMPLETED", "Completed"),
+        ("REFUNDED", "Refunded"),
     ]
 
     user = models.ForeignKey(

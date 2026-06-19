@@ -17,6 +17,7 @@ from rest_framework.exceptions import PermissionDenied
 from django.utils import timezone
 from django.db.models import Sum
 from apps.hotels.models import Hotel, Room
+from apps.payments.services import create_payment
 
 class CreateBookingView(generics.CreateAPIView):
 
@@ -51,8 +52,20 @@ class CreateBookingView(generics.CreateAPIView):
                 "Room already booked for selected dates."
             )
 
-        serializer.save(
+        # serializer.save(
+        #     user=self.request.user
+        # )
+        payment_method = serializer.validated_data.pop(
+            "payment_method"
+        )
+
+        booking = serializer.save(
             user=self.request.user
+        )
+
+        create_payment(
+            booking,
+            payment_method
         )
         
 class MyBookingsView(generics.ListAPIView):
@@ -128,7 +141,14 @@ class ApproveBookingView(APIView):
             and booking.room.hotel.owner != request.user
         ):
             raise PermissionDenied()
-
+        if booking.payment.payment_method == "ONLINE":
+            return Response(
+                {
+                    "error":
+                    "Online bookings are auto confirmed."
+                },
+                status=400
+            )
         booking.status = "CONFIRMED"
         booking.approved_by = request.user
         booking.approved_at = timezone.now()
