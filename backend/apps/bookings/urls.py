@@ -10,6 +10,7 @@ from .views import (
     RejectBookingView,
     CompleteBookingView,
     ManagerDashboardView,
+    BookingHistoryView,
 )
 
 urlpatterns = [
@@ -39,5 +40,9 @@ urlpatterns = [
     path(
         "my/<int:pk>/",
         MyBookingDetailView.as_view()
+    ),
+    path(
+        "history/",
+        BookingHistoryView.as_view()
     ),
 ]

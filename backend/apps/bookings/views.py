@@ -18,6 +18,7 @@ from django.utils import timezone
 from django.db.models import Sum
 from apps.hotels.models import Hotel, Room
 from apps.payments.services import create_payment
+from django.utils import timezone
 
 class CreateBookingView(generics.CreateAPIView):
 
@@ -273,3 +274,57 @@ class MyBookingDetailView(
         return Booking.objects.filter(
             user=self.request.user
         )
+    
+class BookingHistoryView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        history_type = request.GET.get("type")
+
+        today = timezone.now().date()
+
+        bookings = Booking.objects.filter(
+            user=request.user
+        )
+
+        if history_type == "upcoming":
+
+            bookings = bookings.filter(
+                check_in__gte=today
+            ).exclude(
+                status__in=[
+                    "CANCELLED",
+                    "REFUNDED"
+                ]
+            )
+
+        elif history_type == "past":
+
+            bookings = bookings.filter(
+                check_out__lt=today
+            )
+
+        elif history_type == "cancelled":
+
+            bookings = bookings.filter(
+                status="CANCELLED"
+            )
+
+        elif history_type == "refunded":
+
+            bookings = bookings.filter(
+                status="REFUNDED"
+            )
+
+        bookings = bookings.order_by(
+            "-created_at"
+        )
+        
+        serializer = BookingSerializer(
+            bookings,
+            many=True
+        )
+
+        return Response(serializer.data)

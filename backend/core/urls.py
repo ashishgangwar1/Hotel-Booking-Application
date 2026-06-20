@@ -56,6 +56,10 @@ urlpatterns = [
         "api/payments/",
         include("apps.payments.urls")
     ),
+    path(
+        "api/wishlist/",
+        include("apps.wishlist.urls")
+    ),
 ]
 
 # Media files during development
