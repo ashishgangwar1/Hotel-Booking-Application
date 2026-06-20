@@ -19,6 +19,9 @@ from django.db.models import Sum
 from apps.hotels.models import Hotel, Room
 from apps.payments.services import create_payment
 from django.utils import timezone
+from django.db.models import Sum
+from django.db.models.functions import TruncMonth
+from django.utils import timezone
 
 class CreateBookingView(generics.CreateAPIView):
 
@@ -328,3 +331,94 @@ class BookingHistoryView(APIView):
         )
 
         return Response(serializer.data)
+    
+class RevenueAnalyticsView(APIView):
+
+    permission_classes = [
+        IsManagerOrAdmin
+    ]
+
+    def get(self, request):
+
+        bookings = Booking.objects.filter(
+            room__hotel__owner=request.user,
+            status="COMPLETED"
+        )
+
+        total_revenue = (
+            bookings.aggregate(
+                total=Sum("total_amount")
+            )["total"] or 0
+        )
+
+        monthly_revenue = (
+            bookings
+            .annotate(
+                month=TruncMonth("created_at")
+            )
+            .values("month")
+            .annotate(
+                revenue=Sum("total_amount")
+            )
+            .order_by("month")
+        )
+
+        hotel_revenue = (
+            bookings
+            .values(
+                "room__hotel__name"
+            )
+            .annotate(
+                revenue=Sum("total_amount")
+            )
+        )
+
+        return Response({
+            "total_revenue": total_revenue,
+            "monthly_revenue": monthly_revenue,
+            "hotel_revenue": hotel_revenue
+        })
+    
+class OccupancyAnalyticsView(APIView):
+
+    permission_classes = [
+        IsManagerOrAdmin
+    ]
+
+    def get(self, request):
+
+        today = timezone.now().date()
+
+        total_rooms = Room.objects.filter(
+            hotel__owner=request.user
+        ).count()
+
+        occupied_rooms = Room.objects.filter(
+            hotel__owner=request.user,
+            bookings__status__in=[
+                "CONFIRMED",
+                "COMPLETED"
+            ],
+            bookings__check_in__lte=today,
+            bookings__check_out__gt=today
+        ).distinct().count()
+
+        available_rooms = (
+            total_rooms - occupied_rooms
+        )
+
+        occupancy_rate = (
+            occupied_rooms / total_rooms * 100
+            if total_rooms > 0
+            else 0
+        )
+
+        return Response({
+            "total_rooms": total_rooms,
+            "occupied_rooms": occupied_rooms,
+            "available_rooms": available_rooms,
+            "occupancy_rate": round(
+                occupancy_rate,
+                2
+            )
+        })

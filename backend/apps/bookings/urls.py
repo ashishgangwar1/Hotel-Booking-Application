@@ -11,6 +11,8 @@ from .views import (
     CompleteBookingView,
     ManagerDashboardView,
     BookingHistoryView,
+    RevenueAnalyticsView,
+    OccupancyAnalyticsView,
 )
 
 urlpatterns = [
@@ -44,5 +46,13 @@ urlpatterns = [
     path(
         "history/",
         BookingHistoryView.as_view()
+    ),
+    path(
+        "manager/revenue/",
+        RevenueAnalyticsView.as_view()
+    ),
+    path(
+        "manager/occupancy/",
+        OccupancyAnalyticsView.as_view()
     ),
 ]
