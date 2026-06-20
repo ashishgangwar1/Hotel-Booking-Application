@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
         }
         try {
             // Attempt to fetch the manager's hotel
-            await axios.get(`${BASE_URL}hotels/my_hotel/`, {
+            await axios.get(`${BASE_URL}hotels/my-hotels/`, {
                 headers: { Authorization: `Bearer ${tokens.access}` }
             });
             setIsManager(true);
@@ -94,7 +94,7 @@ export const AuthProvider = ({ children }) => {
     // --- Registration Function ---
     const registerUser = async (username, email, password, password2) => {
         try {
-            const response = await axios.post(`${BASE_URL}register/`, {
+            const response = await axios.post(`${BASE_URL}accounts/register/`, {
                 username,
                 email,
                 password,

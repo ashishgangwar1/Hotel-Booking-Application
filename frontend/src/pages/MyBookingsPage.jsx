@@ -32,7 +32,7 @@ function MyBookingsPage() {
             }
 
             try {
-                const response = await axios.get(`${BASE_URL}bookings/`, {
+                const response = await axios.get(`${BASE_URL}bookings/my/`, {
                     headers: {
                         // CRITICAL: Include the Access Token for authentication
                         Authorization: `Bearer ${authTokens.access}`,

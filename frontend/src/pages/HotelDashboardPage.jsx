@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import ProtectedRoute from '../components/ProtectedRoute';
 
 const BASE_URL = 'http://127.0.0.1:8000/api/';
-const MY_HOTEL_URL = 'http://127.0.0.1:8000/api/hotels/my_hotel/';
+const MY_HOTEL_URL = 'http://127.0.0.1:8000/api/hotels/my-hotels/';
 
 // Component to handle adding a new room
 const AddRoomForm = ({ hotelId, authTokens, onRoomAdded }) => {
@@ -37,7 +37,7 @@ const AddRoomForm = ({ hotelId, authTokens, onRoomAdded }) => {
                 total_rooms: parseInt(formData.total_rooms),
             };
 
-            const response = await axios.post(`${BASE_URL}rooms/`, payload, {
+            const response = await axios.post(`${BASE_URL}hotels/manager/rooms/create/`, payload, {
                 headers: {
                     Authorization: `Bearer ${authTokens.access}`,
                     'Content-Type': 'application/json',
