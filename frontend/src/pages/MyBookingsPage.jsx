@@ -95,20 +95,46 @@ function MyBookingsPage() {
                 <div style={styles.list}>
                     {bookings.map((booking) => (
                         <div key={booking.id} style={styles.card}>
-                            <h3 style={styles.cardHeader}>{booking.room_name || 'Room Details Unavailable'}</h3>
-                            <p><strong>Hotel/Room ID:</strong> {booking.room}</p>
-                            <p><strong>Check-in:</strong> {booking.check_in_date}</p>
-                            <p><strong>Check-out:</strong> {booking.check_out_date}</p>
-                            <p><strong>Guests:</strong> {booking.num_guests}</p>
-                            <p style={styles.price}><strong>Total Paid:</strong> ${parseFloat(booking.total_price).toFixed(2)}</p>
-                            <p style={styles.status}>Booked On: {new Date(booking.booked_at).toLocaleDateString()}</p>
+                            <h3 style={styles.cardHeader}>
+                                Booking #{booking.booking_reference}
+                            </h3>
+
+                            <p>
+                                <strong>Room ID:</strong> {booking.room}
+                            </p>
+
+                            <p>
+                                <strong>Check-in:</strong> {booking.check_in}
+                            </p>
+
+                            <p>
+                                <strong>Check-out:</strong> {booking.check_out}
+                            </p>
+
+                            <p>
+                                <strong>Guests:</strong> {booking.guests}
+                            </p>
+
+                            <p style={styles.price}>
+                                <strong>Total Paid:</strong>
+                                ₹{booking.total_amount}
+                            </p>
+
+                            <p style={styles.status}>
+                                Booked On:
+                                {new Date(booking.created_at).toLocaleDateString()}
+                            </p>
+
+                            <p>
+                                <strong>Status:</strong> {booking.status}
+                            </p>
                         </div>
                     ))}
-                </div>
-            )}
-        </div>
-    );
-}
+                    </div>
+                        )}
+                    </div>
+                );
+            }
 
 // We wrap the component in ProtectedRoute for routing ease (see next step)
 const ProtectedMyBookingsPage = (props) => (
