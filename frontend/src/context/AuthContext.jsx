@@ -22,13 +22,16 @@ export const AuthProvider = ({ children }) => {
     const [authLoading, setAuthLoading] = useState(true);
     const [loginLoading, setLoginLoading] = useState(false);
 
-    // ✅ Refresh the access token using the refresh token
+    
     const refreshAccessToken = useCallback(async () => {
+         if (isRefreshing) return null;
         const stored = localStorage.getItem('authTokens');
         if (!stored) return null;
 
         const tokens = JSON.parse(stored);
         if (!tokens?.refresh) return null;
+
+        isRefreshing = true;
 
         try {
             const response = await axios.post(`${BASE_URL}token/refresh/`, {
@@ -46,9 +49,15 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             // Refresh token also expired — force logout
             console.warn("Refresh token expired. Logging out.");
-            logoutUser();
-            return null;
+            localStorage.removeItem('authTokens');  
+            setAuthTokens(null);
+            setUser(null);
+            setIsManager(false);
+            navigate('/login');
         }
+        finally {
+        isRefreshing = false;  
+    }
     }, []);
 
     // ✅ Axios interceptor — auto-refresh on any 401 response
@@ -59,6 +68,9 @@ export const AuthProvider = ({ children }) => {
                 const originalRequest = error.config;
 
                 // If 401 and we haven't retried yet
+                if (originalRequest.url?.includes('token/refresh/')) {
+                    return Promise.reject(error);
+                }
                 if (
                     error.response?.status === 401 &&
                     !originalRequest._retry
