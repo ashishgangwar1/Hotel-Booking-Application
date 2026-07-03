@@ -1,0 +1,54 @@
+Current Test Dataset
+Users
+Username	Password	Role
+c1	12345678	CUSTOMER
+c2	12345678	CUSTOMER
+m1	12345678	MANAGER
+m2	12345678	MANAGER
+a1	12345678	ADMIN
+a2	12345678	ADMIN
+Hotels
+ID	Hotel	Owner
+6	Hotel M1	m1
+7	Hotel M2	m2
+Room Types
+ID	Name	Hotel
+7	Deluxe	Hotel M1
+6	Standard	Hotel M2
+Rooms
+Room ID	Room No	Hotel
+5	101	Hotel M1
+6	102	Hotel M1
+3	201	Hotel M2
+4	202	Hotel M2
+Bookings
+Booking A
+Field	Value
+Booking ID	15
+Reference	HB2C78D6A4D7
+Customer	c1
+User ID	11
+Room	5
+Hotel	Hotel M1
+Manager	m1
+Check In	2026-07-01
+Check Out	2026-07-05
+Guests	2
+Price/Night	3000
+Total	12000
+Status	PENDING / CONFIRMED / COMPLETED
+Booking B
+Field	Value
+Booking ID	16
+Reference	HBD587A17903
+Customer	c2
+User ID	12
+Room	3
+Hotel	Hotel M2
+Manager	m2
+Check In	2026-07-10
+Check Out	2026-07-15
+Guests	2
+Price/Night	2000
+Total	10000
+Status	PENDING / REJECTED

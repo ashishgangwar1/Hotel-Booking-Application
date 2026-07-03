@@ -1,0 +1,18 @@
+from rest_framework.permissions import BasePermission
+from apps.accounts.models import UserRole
+
+class IsManagerOrAdmin(BasePermission):
+
+    def has_permission(
+        self,
+        request,
+        view
+    ):
+        return (
+            request.user.is_authenticated
+            and
+            request.user.profile.role in [
+                UserRole.MANAGER,
+                UserRole.ADMIN
+            ]
+        )
