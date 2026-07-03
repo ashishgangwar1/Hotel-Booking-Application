@@ -2,6 +2,18 @@ from django.db import models
 
 class Payment(models.Model):
 
+    class Status(models.TextChoices):
+        PENDING = "PENDING", "Pending"
+        SUCCESS = "SUCCESS", "Success"
+        FAILED = "FAILED", "Failed"
+        REFUNDED = "REFUNDED", "Refunded"
+
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDING
+    )
+
     PAYMENT_METHOD_CHOICES = [
         ("ONLINE", "Online"),
         ("CASH", "Cash On Arrival"),
@@ -17,7 +29,7 @@ class Payment(models.Model):
     payment_method = models.CharField(
         max_length=20,
         choices=PAYMENT_METHOD_CHOICES,
-        default="Cash On Arrival"
+        default="CASH"
     )
 
     booking = models.OneToOneField(
@@ -34,6 +46,12 @@ class Payment(models.Model):
     transaction_id = models.CharField(
         max_length=255,
         unique=True,
+        null=True,
+        blank=True
+    )
+    
+    paypal_order_id = models.CharField(
+        max_length=255,
         null=True,
         blank=True
     )

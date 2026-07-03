@@ -2,8 +2,8 @@ from django.db import transaction
 
 from .models import Booking
 from .availability_service import AvailabilityService
-from apps.hotels.models import Room
-from apps.payments.services import create_payment
+from hotels.models import Room
+from payments.services import create_payment
 
 class BookingService:
 
