@@ -1,12 +1,9 @@
-// frontend/src/components/Header.jsx
-
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // 1. Import the Auth Context
+import { useAuth } from '../context/AuthContext';
 
 function Header() {
-    // 2. Use the useAuth hook to get user data and the logout function
-    const { user, logoutUser } = useAuth(); 
+    const { user, logoutUser, isManager } = useAuth();
 
     return (
         <header style={styles.header}>
@@ -15,36 +12,80 @@ function Header() {
                     🏨 Hotel Bookings
                 </Link>
             </div>
-            
+
             <nav style={styles.nav}>
                 <ul style={styles.navList}>
-                    {/* Main Navigation Link */}
+
+                    {/* Public Link */}
                     <li style={styles.navItem}>
                         <Link to="/" style={styles.navLink}>Home</Link>
                     </li>
 
-                    {/* --- Conditional Links based on Login Status --- */}
-                    {user ? ( // If the 'user' object is present (logged in)
+                    {user ? (
                         <>
-                            {/* Single Smart Dashboard Link */}
+                            {/* ✅ My Bookings */}
                             <li style={styles.navItem}>
-                                <Link to="/dashboard" style={styles.navLink}>Dashboard</Link>
+                                <Link to="/my-bookings" style={styles.navLink}>
+                                    📋 My Bookings
+                                </Link>
                             </li>
-                            
-                            <li style={{...styles.navItem, color: '#ffc107', fontWeight: 'bold'}}>
+
+                            {/* ✅ Wishlist */}
+                            <li style={styles.navItem}>
+                                <Link to="/wishlist" style={styles.navLink}>
+                                    ❤️ Wishlist
+                                </Link>
+                            </li>
+
+                            {/* ✅ Favorites */}
+                            <li style={styles.navItem}>
+                                <Link to="/favorites" style={styles.navLink}>
+                                    ⭐ Favorites
+                                </Link>
+                            </li>
+
+                            {/* Manager only link */}
+                            {isManager && (
+                                <li style={styles.navItem}>
+                                    <Link to="/manager-bookings" style={styles.navLink}>
+                                        🏢 Manager
+                                    </Link>
+                                </li>
+                            )}
+
+                            {/* Dashboard */}
+                            <li style={styles.navItem}>
+                                <Link to="/dashboard" style={styles.navLink}>
+                                    Dashboard
+                                </Link>
+                            </li>
+
+                            {/* Username */}
+                            <li style={styles.username}>
                                 Hello, {user}!
                             </li>
+
+                            {/* Logout */}
                             <li style={styles.navItem}>
-                                <button onClick={logoutUser} style={styles.logoutButton}>Logout</button>
+                                <button
+                                    onClick={logoutUser}
+                                    style={styles.logoutButton}
+                                >
+                                    Logout
+                                </button>
                             </li>
                         </>
-                    ) : ( // If no user (logged out)
+                    ) : (
                         <>
                             <li style={styles.navItem}>
-                                <Link to="/login" style={styles.navLink}>Login</Link>
+                                <Link to="/login" style={styles.navLink}>
+                                    Login
+                                </Link>
                             </li>
                             <li style={styles.navItem}>
-                                <Link to="/register" style={styles.navButton}>Register</Link>
+                                <Link to="/register" style={styles.navButton}>
+                                    Register
+                                </Link>
                             </li>
                         </>
                     )}
@@ -56,25 +97,18 @@ function Header() {
 
 export default Header;
 
-// --- Basic Inline Styling (Same as before) ---
 const styles = {
     header: {
-        backgroundColor: '#003366', 
+        backgroundColor: '#003366',
         color: 'white',
         padding: '10px 40px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
     },
-    logo: {
-        fontSize: '1.5em',
-        fontWeight: 'bold',
-    },
-    logoLink: {
-        color: 'white',
-        textDecoration: 'none',
-    },
+    logo: { fontSize: '1.5em', fontWeight: 'bold' },
+    logoLink: { color: 'white', textDecoration: 'none' },
     nav: {},
     navList: {
         listStyle: 'none',
@@ -84,9 +118,7 @@ const styles = {
         alignItems: 'center',
         gap: '20px',
     },
-    navItem: {
-        display: 'inline',
-    },
+    navItem: { display: 'inline' },
     navLink: {
         color: 'white',
         textDecoration: 'none',
@@ -100,7 +132,6 @@ const styles = {
         textDecoration: 'none',
         borderRadius: '5px',
         fontWeight: 'bold',
-        transition: 'background-color 0.2s',
     },
     logoutButton: {
         backgroundColor: 'transparent',
@@ -110,5 +141,10 @@ const styles = {
         borderRadius: '5px',
         cursor: 'pointer',
         fontWeight: 'bold',
-    }
+    },
+    username: {
+        color: '#ffc107',
+        fontWeight: 'bold',
+        display: 'inline',
+    },
 };

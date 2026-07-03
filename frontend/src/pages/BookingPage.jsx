@@ -27,7 +27,7 @@ function BookingPage() {
             try {
                 // Fetch the specific room data (you might need a specific endpoint for this)
                 // For now, let's assume /api/rooms/{id} exists in your Django setup
-                const response = await axios.get(`${BASE_URL}rooms/${roomId}/`, {
+                const response = await axios.get(`${BASE_URL}hotels/rooms/${roomId}/`, {
                     headers: {
                         // Include the token for authenticated requests (even reads)
                         Authorization: `Bearer ${authTokens.access}`, 
@@ -84,11 +84,11 @@ function BookingPage() {
 
         try {
             const bookingPayload = {
-                room: roomId, // Send the Foreign Key ID
-                check_in_date: bookingData.check_in_date,
-                check_out_date: bookingData.check_out_date,
-                num_guests: bookingData.num_guests,
-                total_price: totalPrice, // The backend should recalculate this, but send it anyway
+                room: roomId,
+                check_in: bookingData.check_in_date,
+                check_out: bookingData.check_out_date,
+                guests: bookingData.num_guests,
+                payment_method: "cash",
             };
 
             const response = await axios.post(`${BASE_URL}bookings/`, bookingPayload, {
@@ -119,7 +119,7 @@ function BookingPage() {
         <div style={styles.container}>
             <h2 style={styles.header}>Confirm Your Booking at {roomDetails.hotel_name || 'Hotel'}</h2>
             <div style={styles.summary}>
-                <p>Room Type: <strong>{roomDetails.room_type}</strong></p>
+                <p>Room Type: <strong>{roomDetails.room_type_name}</strong></p>
                 <p>Price per Night: <strong>${roomDetails.price_per_night}</strong></p>
             </div>
 
@@ -153,7 +153,7 @@ function BookingPage() {
                     type="number" 
                     name="num_guests" 
                     min="1" 
-                    max={roomDetails.max_guests} 
+                    max={roomDetails.capacity} 
                     value={bookingData.num_guests} 
                     onChange={handleInputChange} 
                     required 

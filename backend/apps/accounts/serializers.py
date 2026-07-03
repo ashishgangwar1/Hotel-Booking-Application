@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Profile
+from .models import Wishlist, Favorite
+from apps.hotels.models import Hotel
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -39,3 +41,35 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "profile"
         ]
+
+class HotelMiniSerializer(serializers.ModelSerializer):
+    """Small hotel info for wishlist/favorites"""
+    class Meta:
+        model = Hotel
+        fields = ["id", "name", "city", "rating"]
+
+
+class WishlistSerializer(serializers.ModelSerializer):
+    hotel = HotelMiniSerializer(read_only=True)
+    hotel_id = serializers.PrimaryKeyRelatedField(
+        queryset=Hotel.objects.all(),
+        source="hotel",
+        write_only=True
+    )
+
+    class Meta:
+        model = Wishlist
+        fields = ["id", "hotel", "hotel_id", "added_at"]
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    hotel = HotelMiniSerializer(read_only=True)
+    hotel_id = serializers.PrimaryKeyRelatedField(
+        queryset=Hotel.objects.all(),
+        source="hotel",
+        write_only=True
+    )
+
+    class Meta:
+        model = Favorite
+        fields = ["id", "hotel", "hotel_id", "added_at"]

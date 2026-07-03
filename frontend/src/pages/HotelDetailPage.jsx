@@ -27,8 +27,10 @@ function HotelDetailPage() {
     if (!hotel) return <div style={styles.center}>Hotel not found.</div>;
 
     // Handle Image URL: Check if it's a full URL or needs the base prefix
-    const imageUrl = hotel.main_image 
-        ? (hotel.main_image.startsWith('http') ? hotel.main_image : `${BASE_URL}${hotel.main_image}`)
+    const imageUrl =
+    hotel.images &&
+    hotel.images.length > 0
+        ? `${BASE_URL}${hotel.images[0].image}`
         : "https://via.placeholder.com/800x400?text=No+Image+Available";
 
     return (
@@ -58,9 +60,10 @@ function HotelDetailPage() {
                 {hotel.rooms && hotel.rooms.length > 0 ? (
                     hotel.rooms.map(room => (
                         <div key={room.id} style={styles.roomCard}>
-                            <div style={styles.roomBadge}>{room.room_type}</div>
+                            <div style={styles.roomBadge}>{room.room_type_name || 'Room'}</div>
                             <div style={styles.roomInfo}>
-                                <p><strong>Max Guests:</strong> {room.max_guests} People</p>
+                                <p><strong>Room Number:</strong> {room.room_number}</p>
+                                <p><strong>Max Guests:</strong> {room.capacity} People</p>
                                 <p><strong>Price:</strong> <span style={styles.price}>₹{room.price_per_night}</span> / night</p>
                             </div>
                             <Link to={`/booking/${room.id}`} style={styles.bookBtn}>

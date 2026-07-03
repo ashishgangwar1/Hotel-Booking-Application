@@ -138,6 +138,10 @@ class HotelSerializer(serializers.ModelSerializer):
         many=True,
         read_only=True
     )
+    rooms = RoomSerializer(
+        many=True,
+        read_only=True
+    )
 
     class Meta:
         model = Hotel
@@ -145,5 +149,7 @@ class HotelSerializer(serializers.ModelSerializer):
 
         read_only_fields = (
             "owner",
-            "created_at"
+            " created_at"
         )
+
+        
